@@ -1,0 +1,2 @@
+[lints]
+std = "lua54"
