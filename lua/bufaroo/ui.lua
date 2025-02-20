@@ -10,28 +10,34 @@ M.bufnr = nil
 M.win_id = nil
 M.buffers = {}
 M.closing = false
-M.opts = {}
+M.opts = {
+    use_short_names = true,
+    win_opts = {},
+}
 
 function M.register_config(opts)
-    M.opts = opts
+    M.opts = vim.tbl_deep_extend("force", M.opts, opts)
 end
 
 function M.create_window()
     utils.remove_external_buffers()
 
-    local height = 10 -- 1 lines is default height
-    local width = math.floor(vim.o.columns * 0.75)
+    local win_opts = M.opts.win_opts
+
+    local width = math.floor(vim.o.columns * 0.5)
+    local height = 10
+
     local bufnr = vim.api.nvim_create_buf(false, true)
     local win_id = vim.api.nvim_open_win(bufnr, true, {
         relative = "editor",
-        title = "Bufaroo",
+        title = win_opts.title or "Bufaroo",
         title_pos = "center",
         row = math.floor(((vim.o.lines - height) / 2) - 1),
         col = math.floor((vim.o.columns - width) / 2),
-        width = width,
-        height = height,
+        width = win_opts.width or width,
+        height = win_opts.height or height,
         style = "minimal",
-        border = "single",
+        border = win_opts.border or "single",
         zindex = 100,
     })
 
@@ -62,7 +68,7 @@ function M.close_window()
     local buffers = utils.get_buffers_from_names(
         M.buffers,
         vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true),
-        true
+        M.opts.use_short_names
     )
 
     if M.bufnr ~= nil and vim.api.nvim_buf_is_valid(M.bufnr) then
@@ -91,7 +97,7 @@ function M.toggle_window()
     local window = M.create_window()
 
     local buffers = utils.update_buffers(M.buffers)
-    local buf_names = utils.get_buffer_names(buffers, true)
+    local buf_names = utils.get_buffer_names(buffers, M.opts.use_short_names)
 
     vim.api.nvim_buf_set_lines(window.bufnr, 0, -1, false, buf_names)
 
@@ -125,7 +131,11 @@ function M.toggle_window()
         local selected = nil
 
         if #lines > 0 then
-            selected = utils.get_buffers_from_names(M.buffers, lines, true)[i]
+            selected = utils.get_buffers_from_names(
+                M.buffers,
+                lines,
+                M.opts.use_short_names
+            )[i]
         end
 
         M.toggle_window()
@@ -145,8 +155,11 @@ function M.toggle_window()
             local selected = nil
 
             if #lines > 0 then
-                selected =
-                    utils.get_buffers_from_names(M.buffers, lines, true)[i]
+                selected = utils.get_buffers_from_names(
+                    M.buffers,
+                    lines,
+                    M.opts.use_short_names
+                )[i]
             end
 
             M.toggle_window()
