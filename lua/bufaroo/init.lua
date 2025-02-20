@@ -6,6 +6,13 @@ M.setup = function(opts)
     ui.register_config(opts)
 end
 
-vim.keymap.set("n", "<leader>j", ui.toggle_window, {})
+M.new = function()
+    return {
+        setup = M.setup,
+        toggle_window = ui.toggle_window,
+    }
+end
 
-return M
+local bufaroo = M.new()
+
+return bufaroo
