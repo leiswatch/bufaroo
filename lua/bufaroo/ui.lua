@@ -10,6 +10,11 @@ M.bufnr = nil
 M.win_id = nil
 M.buffers = {}
 M.closing = false
+M.opts = {}
+
+function M.register_config(opts)
+    M.opts = opts
+end
 
 function M.create_window()
     utils.remove_external_buffers()
@@ -38,6 +43,8 @@ function M.create_window()
     vim.api.nvim_buf_set_name(bufnr, "Bufaroo")
     vim.api.nvim_set_option_value("number", true, { win = win_id })
     vim.api.nvim_set_option_value("filetype", "bufaroo", { buf = bufnr })
+    vim.api.nvim_set_option_value("buftype", "acwrite", { buf = bufnr })
+    vim.api.nvim_set_option_value("bufhidden", "delete", { buf = bufnr })
 
     return {
         bufnr = bufnr,
@@ -54,7 +61,7 @@ function M.close_window()
 
     local buffers = utils.get_buffers_from_names(
         M.buffers,
-        vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, false),
+        vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true),
         true
     )
 
@@ -75,7 +82,7 @@ function M.close_window()
 end
 
 function M.toggle_window()
-    if M.win_id ~= nil then
+    if M.win_id ~= nil and vim.api.nvim_win_is_valid(M.win_id) then
         M.close_window()
         return
     end
@@ -89,54 +96,81 @@ function M.toggle_window()
     vim.api.nvim_buf_set_lines(window.bufnr, 0, -1, false, buf_names)
 
     local row = utils.get_buffer_index(buffers, "bufnr", current_buf)
-    vim.api.nvim_win_set_cursor(window.win_id, { row, 0 })
+    if row ~= nil then
+        vim.api.nvim_win_set_cursor(window.win_id, { row, 0 })
+    end
 
     vim.keymap.set("n", "q", M.toggle_window, {
         buffer = window.bufnr,
+        noremap = true,
         silent = true,
+        nowait = true,
     })
 
     vim.keymap.set("n", "<ESC>", M.toggle_window, {
         buffer = window.bufnr,
+        noremap = true,
         silent = true,
     })
 
     vim.keymap.set("n", "<C-c>", M.toggle_window, {
         buffer = window.bufnr,
+        noremap = true,
         silent = true,
     })
 
     vim.keymap.set("n", "<CR>", function()
-        local idx = vim.api.nvim_win_get_cursor(M.win_id)[1]
-        local selected = vim.api.nvim_buf_get_lines(M.bufnr, idx - 1, idx, true)
-        local buffer = nil
+        local i = vim.api.nvim_win_get_cursor(M.win_id)[1]
+        local lines = vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true)
+        local selected = nil
 
-        if #selected > 0 and selected[0] ~= "" then
-            buffer = utils.get_buffers_from_names(M.buffers, selected, true)[1]
+        if #lines > 0 then
+            selected = utils.get_buffers_from_names(M.buffers, lines, true)[i]
         end
 
         M.toggle_window()
 
-        if buffer ~= nil then
-            M.open_buffer(buffer.bufnr)
+        if selected ~= nil then
+            M.open_buffer(selected.bufnr)
         end
     end, {
         buffer = window.bufnr,
+        noremap = true,
         silent = true,
     })
 
+    for i = 1, 9 do
+        vim.keymap.set("n", tostring(i), function()
+            local lines = vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true)
+            local selected = nil
+
+            if #lines > 0 then
+                selected =
+                    utils.get_buffers_from_names(M.buffers, lines, true)[i]
+            end
+
+            M.toggle_window()
+
+            if selected ~= nil then
+                M.open_buffer(selected.bufnr)
+            end
+        end, {
+            buffer = window.bufnr,
+            noremap = true,
+            silent = true,
+        })
+    end
+
     vim.api.nvim_create_autocmd({ "BufLeave" }, {
         buffer = window.bufnr,
-        callback = function()
-            M.toggle_window()
-        end,
+        callback = M.toggle_window,
         group = bufaroo_group,
     })
 
     vim.api.nvim_create_autocmd({ "BufModifiedSet" }, {
         buffer = window.bufnr,
         callback = function()
-            vim.cmd("set nomodified")
+            vim.opt_local.modified = false
         end,
         group = bufaroo_group,
     })
@@ -154,4 +188,5 @@ end
 
 return {
     toggle_window = M.toggle_window,
+    register_config = M.register_config,
 }

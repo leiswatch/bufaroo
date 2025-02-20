@@ -86,7 +86,7 @@ function M.get_buffer_index(buffers, property, value)
         end
     end
 
-    return 1
+    return nil
 end
 
 function M.get_buffers_from_names(buffers, names, use_short_names)
