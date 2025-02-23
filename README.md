@@ -28,6 +28,7 @@ bufaroo is a dead simple buffer manager for Neovim.
 ```
 A floating popup window will appear with the list of your buffers. You can navigate the list with `j` and `k`, select the buffer with `<CR>` or with `1-9`. You can also delete the buffers simply by deleting the line.
 
+![image](https://github.com/user-attachments/assets/9a0030b0-3683-421c-ad61-80889665136e)
 ## Configuration
 Default options:
 ```lua
