@@ -19,6 +19,8 @@ bufaroo is a dead simple buffer manager for Neovim.
   opts = {},
 }
 ```
+### Dependencies
+- [snacks.nvim](https://github.com/folke/snacks.nvim) (optional for buffer delete method, will fallback to Neovim's built-in method)
 
 ## Usage
 ```lua
@@ -38,3 +40,7 @@ opts = {
         border = "single",
     }
 }
+```
+## Similar plugins
+-  [buffer_manager.nvim](https://github.com/j-morano/buffer_manager.nvim) - More options available, which I don't care about.
+-  [rabbit.nvim](https://github.com/VoxelPrismatic/rabbit.nvim)
