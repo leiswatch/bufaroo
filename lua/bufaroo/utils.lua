@@ -70,6 +70,12 @@ end
 function M.update_buffers(buffers)
     local curr_buffers = M.get_buffers()
 
+    for i, buf in ipairs(buffers) do
+        if not contains(curr_buffers, "bufnr", buf.bufnr) then
+            table.remove(buffers, i)
+        end
+    end
+
     for _, buf in ipairs(curr_buffers) do
         if not contains(buffers, "bufnr", buf.bufnr) then
             table.insert(buffers, buf)
