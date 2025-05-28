@@ -65,11 +65,10 @@ function M.close_window()
 
     M.closing = true
 
-    local buffers = utils.get_buffers_from_names(
-        M.buffers,
-        vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true),
-        M.opts.use_short_names
-    )
+    local lines = vim.api.nvim_buf_get_lines(M.bufnr, 0, -1, true)
+
+    local buffers =
+        utils.get_buffers_from_names(M.buffers, lines, M.opts.use_short_names)
 
     if M.bufnr ~= nil and vim.api.nvim_buf_is_valid(M.bufnr) then
         vim.api.nvim_buf_delete(M.bufnr, { force = true })

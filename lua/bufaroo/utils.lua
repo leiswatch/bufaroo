@@ -1,5 +1,11 @@
 local M = {}
 
+--- @param s string
+--- @return string
+local trim = function(s)
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 local function contains(table, property, value)
     for i = 1, #table do
         if table[i][property] == value then
@@ -100,8 +106,9 @@ function M.get_buffers_from_names(buffers, names, use_short_names)
     local property = (use_short_names and "short_bufname") or "bufname"
 
     for _, name in ipairs(names) do
-        if contains(buffers, property, name) then
-            local index = M.get_buffer_index(buffers, property, name)
+        local name_trim = trim(name)
+        if contains(buffers, property, name_trim) then
+            local index = M.get_buffer_index(buffers, property, name_trim)
 
             table.insert(result, buffers[index])
         end
