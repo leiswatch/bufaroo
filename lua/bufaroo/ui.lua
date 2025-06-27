@@ -101,8 +101,11 @@ function M.toggle_window()
     vim.api.nvim_buf_set_lines(window.bufnr, 0, -1, false, buf_names)
 
     local row = utils.get_buffer_index(buffers, "bufnr", current_buf)
-    if row ~= nil then
+
+    if row ~= nil and row > 0 and row <= #buffers then
         vim.api.nvim_win_set_cursor(window.win_id, { row, 0 })
+    else
+        vim.api.nvim_win_set_cursor(window.win_id, { 1, 0 })
     end
 
     vim.keymap.set("n", "q", M.toggle_window, {
