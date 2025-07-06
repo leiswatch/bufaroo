@@ -16,6 +16,20 @@ local function contains(table, property, value)
     return false
 end
 
+local function string_split(inputstr, sep)
+    if sep == nil then
+        sep = "%s"
+    end
+
+    local t = {}
+
+    for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+        table.insert(t, str)
+    end
+
+    return t
+end
+
 function M.get_buffers()
     local buffers = {}
 
@@ -24,17 +38,37 @@ function M.get_buffers()
             local bufname = vim.api.nvim_buf_get_name(bufnr)
             local short_bufname = nil
             local cwd = vim.uv.cwd()
+            local end_index = nil
 
             if cwd ~= nil then
-                local _, end_index = string.find(bufname, cwd, nil, true)
+                _, end_index = string.find(bufname, cwd, nil, true)
 
                 if end_index ~= nil then
-                    short_bufname = string.sub(bufname, end_index + 1)
-                    short_bufname = string.gsub(short_bufname, "/", "", 1)
+                    local tmp = string.sub(bufname, end_index + 1)
+                    short_bufname = string.gsub(tmp, "/", "", 1)
+                else
+                    local relative_path = vim.fn.fnamemodify(
+                        vim.api.nvim_buf_get_name(bufnr),
+                        ":p:h"
+                    )
+                    _, end_index = string.find(cwd, relative_path, nil, true)
+
+                    local relative_part = string.sub(cwd, end_index + 1)
+                    local relative_paths = string_split(relative_part, "/")
+
+                    local tmp = string.sub(bufname, end_index + 1)
+                    tmp = string.gsub(tmp, "/", "", 1)
+                    short_bufname = string.rep("../", #relative_paths) .. tmp
                 end
             end
 
-            if bufname ~= "" then
+            if
+                bufnr ~= nil
+                and bufname ~= ""
+                and bufname ~= nil
+                and short_bufname ~= ""
+                and short_bufname ~= nil
+            then
                 table.insert(buffers, {
                     bufnr = bufnr,
                     bufname = bufname,
