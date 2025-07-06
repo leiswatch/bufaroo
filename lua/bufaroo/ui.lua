@@ -92,7 +92,6 @@ function M.toggle_window()
         return
     end
 
-    local current_buf = vim.api.nvim_get_current_buf()
     local window = M.create_window()
 
     local buffers = utils.update_buffers(M.buffers)
@@ -100,7 +99,7 @@ function M.toggle_window()
 
     vim.api.nvim_buf_set_lines(window.bufnr, 0, -1, false, buf_names)
 
-    local row = utils.get_buffer_index(buffers, "bufnr", current_buf)
+    local row = utils.get_buffer_index(buffers, "bufnr", window.bufnr)
 
     if row ~= nil and row > 0 and row <= #buffers then
         vim.api.nvim_win_set_cursor(window.win_id, { row, 0 })
