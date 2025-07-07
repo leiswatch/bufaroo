@@ -40,26 +40,30 @@ function M.get_buffers()
             local cwd = vim.uv.cwd()
             local end_index = nil
 
-            if cwd ~= nil then
-                _, end_index = string.find(bufname, cwd, nil, true)
+            if cwd == nil then
+                goto continue
+            end
 
-                if end_index ~= nil then
-                    local tmp = string.sub(bufname, end_index + 1)
-                    short_bufname = string.gsub(tmp, "/", "", 1)
-                else
-                    local relative_path = vim.fn.fnamemodify(
-                        vim.api.nvim_buf_get_name(bufnr),
-                        ":p:h"
-                    )
-                    _, end_index = string.find(cwd, relative_path, nil, true)
+            _, end_index = string.find(bufname, cwd, nil, true)
 
-                    local relative_part = string.sub(cwd, end_index + 1)
-                    local relative_paths = string_split(relative_part, "/")
+            if end_index ~= nil then
+                local tmp = string.sub(bufname, end_index + 1)
+                short_bufname = string.gsub(tmp, "/", "", 1)
+            else
+                local relative_path =
+                    vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p:h")
+                _, end_index = string.find(cwd, relative_path, nil, true)
 
-                    local tmp = string.sub(bufname, end_index + 1)
-                    tmp = string.gsub(tmp, "/", "", 1)
-                    short_bufname = string.rep("../", #relative_paths) .. tmp
+                if end_index == nil then
+                    goto continue
                 end
+
+                local relative_part = string.sub(cwd, end_index + 1)
+                local relative_paths = string_split(relative_part, "/")
+
+                local tmp = string.sub(bufname, end_index + 1)
+                tmp = string.gsub(tmp, "/", "", 1)
+                short_bufname = string.rep("../", #relative_paths) .. tmp
             end
 
             if
@@ -76,6 +80,7 @@ function M.get_buffers()
                 })
             end
         end
+        ::continue::
     end
 
     return buffers
