@@ -25,7 +25,7 @@ function M.create_window()
     local win_opts = M.opts.win_opts
 
     local width = math.floor(vim.o.columns * (win_opts.width or 0.5))
-    local height = 10
+    local height = win_opts.height or 10
 
     local bufnr = vim.api.nvim_create_buf(false, true)
     local win_id = vim.api.nvim_open_win(bufnr, true, {
@@ -35,7 +35,7 @@ function M.create_window()
         row = math.floor(((vim.o.lines - height) / 2) - 1),
         col = math.floor((vim.o.columns - width) / 2),
         width = width,
-        height = win_opts.height or height,
+        height = height,
         style = "minimal",
         border = win_opts.border or "single",
         zindex = 100,
