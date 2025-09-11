@@ -37,7 +37,7 @@ function M.get_buffers()
         if vim.fn.buflisted(bufnr) == 1 then
             local bufname = vim.api.nvim_buf_get_name(bufnr)
             local short_bufname = nil
-            local cwd = vim.uv.cwd()
+            local cwd = vim.fn.getcwd()
             local end_index = nil
 
             if cwd == nil then
