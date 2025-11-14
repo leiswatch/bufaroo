@@ -107,7 +107,7 @@ function M.remove_buffers(buffers, curr_buffers)
             if MiniBufremove ~= nil and MiniBufremove.delete ~= nil then
                 MiniBufremove.delete(buf.bufnr)
             elseif Snacks ~= nil and Snacks.bufdelete ~= nil then
-                Snacks.bufdelete(buf.bufnr)
+                Snacks.bufdelete.delete(buf.bufnr)
             else
                 vim.api.nvim_buf_delete(buf.bufnr, {})
             end
