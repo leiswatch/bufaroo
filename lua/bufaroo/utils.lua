@@ -103,15 +103,7 @@ function M.remove_buffers(buffers, curr_buffers)
     for _, buf in ipairs(curr_buffers) do
         if not contains(buffers, "bufnr", buf.bufnr) then
             vim.api.nvim_buf_clear_namespace(buf.bufnr, -1, 1, -1)
-
-            if MiniBufremove ~= nil and MiniBufremove.delete ~= nil then
-                MiniBufremove.delete(buf.bufnr)
-            elseif Snacks ~= nil and Snacks.bufdelete ~= nil then
-                Snacks.bufdelete.delete(buf.bufnr)
-            else
-                vim.api.nvim_buf_delete(buf.bufnr, {})
-            end
-
+            vim.api.nvim_buf_delete(buf.bufnr, {})
         end
     end
 end
