@@ -52,11 +52,23 @@ function M.get_buffers()
             else
                 local relative_path =
                     vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p:h")
-                _, end_index = string.find(cwd, relative_path, nil, true)
 
-                if end_index == nil then
+                local index = 0
+
+                while
+                    index < #cwd
+                    and index < #relative_path
+                    and string.sub(cwd, index + 1, index + 1)
+                        == string.sub(relative_path, index + 1, index + 1)
+                do
+                    index = index + 1
+                end
+
+                if index == 0 then
                     goto continue
                 end
+
+                end_index = index - 1
 
                 local relative_part = string.sub(cwd, end_index + 1)
                 local relative_paths = string_split(relative_part, "/")
