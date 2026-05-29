@@ -115,8 +115,7 @@ function M.remove_buffers(buffers, curr_buffers)
     for _, buf in ipairs(curr_buffers) do
         if not contains(buffers, "bufnr", buf.bufnr) then
             vim.api.nvim_buf_clear_namespace(buf.bufnr, -1, 1, -1)
-            vim.bo[buf.bufnr].buflisted = false
-            vim.api.nvim_buf_delete(buf.bufnr, { force = true, unload = true })
+            vim.api.nvim_cmd({ cmd = "bdelete", args = { buf.bufnr } }, {})
         end
     end
 end
