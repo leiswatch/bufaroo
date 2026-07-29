@@ -34,6 +34,7 @@ Default options:
 ```lua
 opts = {
     use_short_names = true -- remove the vim.uv.cwd() from the beginning of the buffer name
+    sort_buf_names = true,
     win_opts = {
         title = "Bufaroo",
         height = 10,

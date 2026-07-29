@@ -12,6 +12,7 @@ M.buffers = {}
 M.closing = false
 M.opts = {
     use_short_names = true,
+    sort_buf_names = true,
     win_opts = {},
 }
 
@@ -97,6 +98,10 @@ function M.toggle_window()
 
     local buffers = utils.update_buffers(M.buffers)
     local buf_names = utils.get_buffer_names(buffers, M.opts.use_short_names)
+
+    if M.opts.sort_buf_names then
+        table.sort(buf_names)
+    end
 
     vim.api.nvim_buf_set_lines(window.bufnr, 0, -1, false, buf_names)
 
